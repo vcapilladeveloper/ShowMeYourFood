@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		673A39652223B7E500F63B78 /* TableViewManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 673A39642223B7E500F63B78 /* TableViewManager.swift */; };
+		673A39672223B8B500F63B78 /* CellForFood.swift in Sources */ = {isa = PBXBuildFile; fileRef = 673A39662223B8B500F63B78 /* CellForFood.swift */; };
 		676F22642220419A00DFF237 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 676F22632220419A00DFF237 /* AppDelegate.swift */; };
 		676F22662220419A00DFF237 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 676F22652220419A00DFF237 /* ViewController.swift */; };
 		676F22692220419A00DFF237 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 676F22672220419A00DFF237 /* Main.storyboard */; };
@@ -73,6 +75,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		673A39642223B7E500F63B78 /* TableViewManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableViewManager.swift; sourceTree = "<group>"; };
+		673A39662223B8B500F63B78 /* CellForFood.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CellForFood.swift; sourceTree = "<group>"; };
 		676F22602220419A00DFF237 /* ShowMeYourFood.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ShowMeYourFood.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		676F22632220419A00DFF237 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		676F22652220419A00DFF237 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -168,6 +172,8 @@
 				676F226C2220419C00DFF237 /* LaunchScreen.storyboard */,
 				676F226F2220419C00DFF237 /* Info.plist */,
 				676F22CD22219F6000DFF237 /* Extensions.swift */,
+				673A39642223B7E500F63B78 /* TableViewManager.swift */,
+				673A39662223B8B500F63B78 /* CellForFood.swift */,
 			);
 			path = ShowMeYourFood;
 			sourceTree = "<group>";
@@ -409,6 +415,8 @@
 				676F22CE22219F6000DFF237 /* Extensions.swift in Sources */,
 				676F22662220419A00DFF237 /* ViewController.swift in Sources */,
 				676F22642220419A00DFF237 /* AppDelegate.swift in Sources */,
+				673A39652223B7E500F63B78 /* TableViewManager.swift in Sources */,
+				673A39672223B8B500F63B78 /* CellForFood.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

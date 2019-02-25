@@ -26,7 +26,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         if let data = notificaction.object as? [String: String], let message = data["message"] {
             errorMessage = message
         }
-        window?.rootViewController!.showSimpleAlert(errorMessage)
+        DispatchQueue.main.async {
+            self.window?.rootViewController!.showSimpleAlert(errorMessage)
+        }
     }
 }
 

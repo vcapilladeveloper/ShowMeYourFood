@@ -14,7 +14,7 @@ open class ConnectionEngine: NSObject {
     static var dataGetTask: URLSessionDataTask?
     public typealias RequestResult = (_ data: Any?, _ error: Bool) -> Void
     
-    public class func getResult(_ url: URL, _ method: String = "GET", completionHandler: @escaping RequestResult) {
+    open class func getResult(_ url: URL, _ method: String = "GET", completionHandler: @escaping RequestResult) {
         
         dataGetTask?.cancel()
         defaultSession = URLSession(configuration: .default)

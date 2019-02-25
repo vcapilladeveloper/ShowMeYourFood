@@ -24,7 +24,7 @@ public protocol SQLTable {
     static var createStatement: String { get }
 }
 
-final public class PersistenceModule {
+open class PersistenceModule {
     let db: OpaquePointer?
     
     fileprivate var errorMessage: String {
@@ -47,9 +47,10 @@ final public class PersistenceModule {
     public static func open() throws -> PersistenceModule {
         var db: OpaquePointer? = nil
         // 1 Try to connect with DB
+  
         let fileURL = try! FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false)
-                .appendingPathComponent((Bundle.main.object(forInfoDictionaryKey: "database") as? String)!)
-        
+                .appendingPathComponent((Bundle(for: self).object(forInfoDictionaryKey: "database") as? String)!)
+        try FileManager.default.removeItem(at: fileURL as URL)
         if sqlite3_open(fileURL.absoluteString, &db) == SQLITE_OK {
             // 2 If successful, return the pointer to the Database
             return PersistenceModule(db: db)
@@ -70,7 +71,7 @@ final public class PersistenceModule {
         }
     }
     
-    public func prepareStatement(sql: String) throws -> OpaquePointer? {
+    open func prepareStatement(sql: String) throws -> OpaquePointer? {
         var statement: OpaquePointer? = nil
         guard sqlite3_prepare_v2(db, sql, -1, &statement, nil) == SQLITE_OK else {
             throw SQLiteError.Prepare(message: errorMessage)
@@ -79,7 +80,7 @@ final public class PersistenceModule {
         return statement
     }
     
-    public func createTable(table: SQLTable.Type) throws {
+    open func createTable(table: SQLTable.Type) throws {
         
         let createTableStatement = try prepareStatement(sql: table.createStatement)
         
@@ -90,7 +91,18 @@ final public class PersistenceModule {
         }
     }
     
-    public func insert(statement: String) throws {
+    public static func deleteDatabase() {
+        let fileURL = try! FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false)
+            .appendingPathComponent((Bundle(for: self).object(forInfoDictionaryKey: "database") as? String)!)
+        do {
+            try FileManager.default.removeItem(at: fileURL as URL)
+        } catch {
+//            NotificationCenter.default.post(name: .error, object: ["message": error.localizedDescription])
+            print(error.localizedDescription)
+        }
+    }
+    
+    open func insert(statement: String) throws {
         
         let insertSql = statement
         let insertStatement = try prepareStatement(sql: insertSql)

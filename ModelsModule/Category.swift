@@ -20,7 +20,7 @@ extension Category: SQLTable {
     public static var createStatement: String {
         return """
             CREATE TABLE IF NOT EXISTS Categories (
-            id TEXT PRIMARY KEY NOT NULL,
+            id TEXT NOT NULL,
             priority INTEGER NOT NULL,
             name TEXT NOT NULL);
         """
