@@ -20,6 +20,9 @@ class ViewController: UIViewController, ManageProductsDelegate {
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var cartProducts: UILabel!
     @IBOutlet weak var cartPrice: UILabel!
+    @IBOutlet weak var restaurantTitle: UILabel!
+    @IBOutlet weak var productCountTitle: UILabel!
+    @IBOutlet weak var totalCartTitle: UILabel!
     
     var tableViewManager = TableViewManager()
     
@@ -28,8 +31,11 @@ class ViewController: UIViewController, ManageProductsDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        tableView.delegate = (tableViewManager as! UITableViewDelegate)
+        tableView.dataSource = (tableViewManager as! UITableViewDataSource)
         tableViewManager.manageProducts = self
+        restaurantTitle.text = LangStr.langStr("Label.resttitle")
+        productCountTitle.text = LangStr.langStr("Label.products")
+        totalCartTitle.text = LangStr.langStr("Label.total")
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -41,7 +47,7 @@ class ViewController: UIViewController, ManageProductsDelegate {
             productsManager = ProductsManager(persistenceModule!)
             ConnectionEngine.getResult(URL(string: (Bundle.main.object(forInfoDictionaryKey: "url") as? String)!)!) { (data, error) in
                             if error {
-                                NotificationCenter.default.post(name: .error, object: ["message": "Can't get data form this site."])
+                                NotificationCenter.default.post(name: .error, object: ["message": LangStr.langStr("Error.getdata")])
                             } else if let d = data as? Data{
                                 var categories = [[String: Any]]()
                                 if let products: [Product] = DataModelEngine.modelSerializer(d) {
@@ -50,7 +56,9 @@ class ViewController: UIViewController, ManageProductsDelegate {
                                         try self.persistenceModule?.createTable(table: Category.self)
                                         products: for product in products {
                                             if let category = product.category {
-                                                categories.append(["id": category.id, "name": category.name])
+                                                if categories.filter({($0["id"] as? String) == category.id}).count == 0 {
+                                                    categories.append(["id": category.id, "name": category.name])
+                                                }
                                                 do {
                                                     let c = category.name.replacingOccurrences(of: "'", with: "")
                                                     try self.persistenceModule?.insert(statement: "INSERT INTO Categories (id, name, priority) VALUES ('\(category.id)', '\(c)', 10)")
@@ -59,7 +67,7 @@ class ViewController: UIViewController, ManageProductsDelegate {
                                                     let statement = "INSERT INTO Products (id, name, description, storeID, productID, amount, total, fees, categoryId) VALUES ('\(product.id)', '\(n)', '\(d)', '\(product.storeID ?? "")', '\(product.productID )', \(product.amount ?? 0.0), \(product.total ?? 0.0), \(product.fees ?? 0.0), '\(category.id)')"
                                                 try self.persistenceModule?.insert(statement: statement)
                                                 } catch {
-                                                    NotificationCenter.default.post(name: .error, object: ["message": "Error downloading and saving data."])
+                                                    NotificationCenter.default.post(name: .error, object: ["message": LangStr.langStr("Error.downloadandsave")])
                                                     break products
                                                 }
                                             }
@@ -67,8 +75,10 @@ class ViewController: UIViewController, ManageProductsDelegate {
                                         let data = self.productsManager?.getProducts()
                                         self.tableViewManager.products = data
                                         self.tableViewManager.categories = categories
-                                        self.tableView.reloadData()
-                                        self.loader(false)
+                                        DispatchQueue.main.async {
+                                            self.tableView.reloadData()
+                                            self.loader(false)
+                                        }
                                     } catch {
                                         NotificationCenter.default.post(name: .error, object: ["message": error.localizedDescription])
                                     }

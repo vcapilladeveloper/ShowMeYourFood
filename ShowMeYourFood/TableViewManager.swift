@@ -16,7 +16,7 @@ protocol ManageProductsDelegate {
 final class TableViewManager: NSObject {
     var products: [[String: Any]]?
     var categories: [[String: Any]]?
-    var cartProducts: [String]?
+    var cartProducts = [String]()
     var total: Double = 0.0
     var manageProducts: ManageProductsDelegate?
 }
@@ -26,13 +26,13 @@ extension TableViewManager: UITableViewDataSource, ProductCellDelegate {
         
         if let p = product {
             if add {
-                cartProducts?.append(p["id"] as! String)
+                cartProducts.append(p["id"] as! String)
                 total += p["total"] as! Double
-                manageProducts?.updateCart((cartProducts?.count)!, total)
+                manageProducts?.updateCart(cartProducts.count, total)
             } else {
-                cartProducts = cartProducts?.filter({$0 != p["id"] as! String})
+                cartProducts = cartProducts.filter({$0 != p["id"] as! String})
                 total -= p["total"] as! Double
-                manageProducts?.updateCart((cartProducts?.count)!, total)
+                manageProducts?.updateCart(cartProducts.count, total)
             }
         }
     }
@@ -58,12 +58,15 @@ extension TableViewManager: UITableViewDataSource, ProductCellDelegate {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: "productCell", for: indexPath) as? CellForFood else {
             return UITableViewCell()
         }
-        
-        let product = products![indexPath.row]
+        var productsByCategory = [[String: Any]]()
+        if let p = products, let c = categories {
+             productsByCategory = p.filter({$0["categoryId"] as? String == c[indexPath.section]["id"] as? String })
+        }
+        let product = productsByCategory[indexPath.row]
         cell.product = product
         cell.productName.text = product["name"] as? String
         cell.productDescription.text = product["description"] as? String
-        cell.productPrice.text = "\(product["total"] as? Double ?? 0.0)"
+        cell.productPrice.text = "\(product["total"] as? Double ?? 0.0)€"
         cell.delegate = self
  
         return cell

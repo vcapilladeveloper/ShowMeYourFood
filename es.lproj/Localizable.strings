@@ -1,0 +1,22 @@
+/* 
+  Localizable.strings
+  ShowMeYourFood
+
+  Created by Victor Capilla Developer on 25/02/2019.
+  Copyright © 2019 VCapillaDev. All rights reserved.
+*/
+
+/*      */
+"Error.getdata" = "No se han obtenido datos del servidor.";
+
+/*      */
+"Error.downloadandsave" = "Se ha producido un error al descargar y guardar los datos.";
+
+/*      */
+"Label.resttitle" = "Restaurante Goku";
+
+/*      */
+"Label.products" = "Productos";
+
+/*      */
+"Label.total" = "Total";
