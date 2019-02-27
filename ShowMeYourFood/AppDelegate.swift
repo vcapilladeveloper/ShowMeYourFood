@@ -21,6 +21,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         return true
     }
 
+    // On recive notification, we call this function that shows an AlertView in the actual rootViewController
     @objc func showSimpleAlert(_ notificaction: Notification) {
         var errorMessage = "Ups, something went wrong!"
         if let data = notificaction.object as? [String: String], let message = data["message"] {
