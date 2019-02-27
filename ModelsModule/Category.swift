@@ -9,6 +9,7 @@
 import Foundation
 import PersistenceModule
 
+// Category model implementign codable for generate objects from requested data.
 public class Category: Codable {
     public let id: String
     public let priority: Int
@@ -17,6 +18,8 @@ public class Category: Codable {
 
 extension Category: SQLTable {
 
+    // Implements SQLTable protocol, setting up the createStatement 
+    // computed variable for the creation of table in data base
     public static var createStatement: String {
         return """
             CREATE TABLE IF NOT EXISTS Categories (
