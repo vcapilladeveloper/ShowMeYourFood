@@ -8,6 +8,7 @@
 
 import Foundation
 
+// Class to manage the Language strings localized
 final class LangStr {
     
     final class func langStr(_ text: String) -> String {
