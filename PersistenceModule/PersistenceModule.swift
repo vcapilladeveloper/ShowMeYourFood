@@ -9,10 +9,12 @@
 import Foundation
 import SQLite3
 
+// Extends Notification names to add Error to the cases of names.
 extension Notification.Name {
     static let error = Notification.Name("error")
 }
 
+// Custom enumerates for generated errors in each domain
 enum SQLiteError: Error {
     case OpenDatabase(message: String)
     case Prepare(message: String)
@@ -20,13 +22,17 @@ enum SQLiteError: Error {
     case Bind(message: String)
 }
 
+// Protocol for apply to the Classes or Structs wich need to define a Create Table Statement
 public protocol SQLTable {
     static var createStatement: String { get }
 }
 
+// Class designed  for manage the database
 open class PersistenceModule {
+    // Pointer to the database
     let db: OpaquePointer?
     
+    // With this computed vairable, we can get the last error message from the database log.
     fileprivate var errorMessage: String {
         if let errorPointer = sqlite3_errmsg(db) {
             let errorMessage = String(cString: errorPointer)
@@ -44,18 +50,19 @@ open class PersistenceModule {
         sqlite3_close(db)
     }
         
+    // Open instance of DB if exsists
     public static func open() throws -> PersistenceModule {
         var db: OpaquePointer? = nil
-        // 1 Try to connect with DB
+        //Try to connect with DB
   
         let fileURL = try! FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false)
                 .appendingPathComponent((Bundle(for: self).object(forInfoDictionaryKey: "database") as? String)!)
         try FileManager.default.removeItem(at: fileURL as URL)
         if sqlite3_open(fileURL.absoluteString, &db) == SQLITE_OK {
-            // 2 If successful, return the pointer to the Database
+            // If successful, return the pointer to the Database
             return PersistenceModule(db: db)
         } else {
-            // 3 Otherwise, return the error, after closing the database in case is not nil.
+            // Otherwise, return the error, after closing the database in case is not nil.
             defer {
                 if db != nil {
                     sqlite3_close(db)
@@ -71,6 +78,7 @@ open class PersistenceModule {
         }
     }
     
+    // Send string to this method to know if is a good statement for execute.
     open func prepareStatement(sql: String) throws -> OpaquePointer? {
         var statement: OpaquePointer? = nil
         guard sqlite3_prepare_v2(db, sql, -1, &statement, nil) == SQLITE_OK else {
@@ -80,6 +88,9 @@ open class PersistenceModule {
         return statement
     }
     
+    // Function Designed to create table.
+    // For this function, we send a class with SQLTable protocol implemented
+    // And this make let us call createStatement computed property
     open func createTable(table: SQLTable.Type) throws {
         
         let createTableStatement = try prepareStatement(sql: table.createStatement)
@@ -91,17 +102,19 @@ open class PersistenceModule {
         }
     }
     
+    // Remove database
+    // TODO: Controll if don't want to remove the database
     public static func deleteDatabase() {
         let fileURL = try! FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false)
             .appendingPathComponent((Bundle(for: self).object(forInfoDictionaryKey: "database") as? String)!)
         do {
             try FileManager.default.removeItem(at: fileURL as URL)
         } catch {
-//            NotificationCenter.default.post(name: .error, object: ["message": error.localizedDescription])
             print(error.localizedDescription)
         }
     }
     
+    // Function where we send a string statement with a Insert Query.
     open func insert(statement: String) throws {
         
         let insertSql = statement
@@ -111,76 +124,5 @@ open class PersistenceModule {
         guard sqlite3_step(insertStatement) == SQLITE_DONE else {
             throw SQLiteError.Step(message: errorMessage)
         }
-
-//        do {
-//            try db.insertContact(contact: Contact(id: 1, name: "Ray"))
-//        } catch {
-//            print(db.errorMessage)
-//        }
     }
-    
-    /*func getData<T>(query: String) -> [T]? {
-        guard let queryStatement = try? prepareStatement(sql: query) else {
-            return nil
-        }
-        
-        defer { sqlite3_finalize(queryStatement) }
-        var data: [T]? = nil
-        while sqlite3_step(queryStatement) == SQLITE_ROW {
-            
-            
-        }
-    }*/
-    
-//    func contact(id: Int32) -> Contact? {
-//        let querySql = "SELECT * FROM Contact WHERE Id = ?;"
-//        guard let queryStatement = try? prepareStatement(sql: querySql) else {
-//            return nil
-//        }
-//        
-//        defer {
-//            sqlite3_finalize(queryStatement)
-//        }
-//        
-//        guard sqlite3_bind_int(queryStatement, 1, id) == SQLITE_OK else {
-//            return nil
-//        }
-//        
-//        guard sqlite3_step(queryStatement) == SQLITE_ROW else {
-//            return nil
-//        }
-//        
-//        let id = sqlite3_column_int(queryStatement, 0)
-//        
-//        let queryResultCol1 = sqlite3_column_text(queryStatement, 1)
-//        let name = String(cString: queryResultCol1!) as NSString
-//        
-//        return Contact(id: id, name: name)
-//    }
 }
-
-/**
- struct Contact {
- let id: Int32
- let name: NSString
- }
- 
- extension Contact: SQLTable {
- static var createStatement: String {
- return """
- CREATE TABLE Contact(
- Id INT PRIMARY KEY NOT NULL,
- Name CHAR(255)
- );
- """
- }
- }
- 
- 
- do {
- try db.createTable(table: Contact.self)
- } catch {
- print(db.errorMessage)
- }
- 
- */
