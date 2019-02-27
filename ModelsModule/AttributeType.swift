@@ -9,6 +9,7 @@
 import Foundation
 import PersistenceModule
 
+// Attribute_type model implementing codable to generate objects from requested data.
 public struct AttributeType: Codable {
     let id: String
     let attributes: [Attribute]
@@ -16,6 +17,9 @@ public struct AttributeType: Codable {
     let name: String
 }
 
+
+// Implements SQLTable protocol, setting up the createStatement 
+// computed variable for the creation of table in data base
 extension AttributeType: SQLTable {
 
     public static var createStatement: String {
