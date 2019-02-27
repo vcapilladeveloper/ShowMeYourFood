@@ -9,6 +9,7 @@
 import Foundation
 import PersistenceModule
 
+// Product model implementing codable for generate objects from requested data.
 public class Product: Codable{
     
     public let storeID: String?
@@ -23,6 +24,7 @@ public class Product: Codable{
     public let category: Category?
     public let attributeTypes: [AttributeType]?
     
+    // Because some keys from Encode are not the same like recived from server, we must make the assignation
     enum CodingKeys: String, CodingKey {
         case storeID = "storeId"
         case productID = "productId"
@@ -33,6 +35,8 @@ public class Product: Codable{
 }
 
 
+// Implements SQLTable protocol, setting up the createStatement 
+// computed variable for the creation of table in data base
 extension Product: SQLTable {
 
     public static var createStatement: String {
