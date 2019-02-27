@@ -9,12 +9,14 @@
 import Foundation
 import UIKit
 
-
+// Protocol for implement the IBAction from the button inside the cell
 protocol ProductCellDelegate {
     func selectedProduct(_ add: Bool, _ product: [String: Any]?)
 }
 
+// TableViewCell custom class for the Product Table
 final class CellForFood: UITableViewCell {
+    // We need an instance of Product to send to the delegate when click the add/remove button
     var product: [String: Any]?
     var delegate: ProductCellDelegate?
     @IBOutlet weak var productName: UILabel!
