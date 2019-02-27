@@ -9,12 +9,15 @@
 import Foundation
 import PersistenceModule
 
+// Attribute model implementing codable protocol to get the values directly from request.
 public struct Attribute: Codable {
     let id: String
     let total, amount, fees: Double
     let name: String
 }
 
+// Implements SQLTable protocol, setting up the createStatement 
+// computed variable for the creation of table in data base
 extension Attribute: SQLTable {
 
     public static var createStatement: String {
