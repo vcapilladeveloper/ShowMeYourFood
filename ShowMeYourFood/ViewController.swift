@@ -11,7 +11,10 @@ import ModelsModule
 import ConnectionModule
 import PersistenceModule
 
+// View Controller to show the products in a TableView and show cart information each time we 
+// Touch the button inside cells. Implements ManageProducts Protocol
 class ViewController: UIViewController, ManageProductsDelegate {
+    // Each time we select the button inside a cell, this func is fired for update cart infromation.
     func updateCart(_ count: Int, _ total: Double) {
         cartProducts.text = "\(count)"
         cartPrice.text = "\(total)€"
@@ -41,19 +44,24 @@ class ViewController: UIViewController, ManageProductsDelegate {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         loader(true)
-        
+        // First of all open database, in case we recive an error, we get message in the catch.
         do {
             persistenceModule = try PersistenceModule.open()
             productsManager = ProductsManager(persistenceModule!)
+            // Connect to get products
             ConnectionEngine.getResult(URL(string: (Bundle.main.object(forInfoDictionaryKey: "url") as? String)!)!) { (data, error) in
                             if error {
                                 NotificationCenter.default.post(name: .error, object: ["message": LangStr.langStr("Error.getdata")])
                             } else if let d = data as? Data{
+                                // If we can retrieve information and decode to desired type
                                 var categories = [[String: Any]]()
                                 if let products: [Product] = DataModelEngine.modelSerializer(d) {
                                     do {
+                                        // Create tables for save Products and Categories
                                         try self.persistenceModule?.createTable(table: Product.self)
                                         try self.persistenceModule?.createTable(table: Category.self)
+                                        // For each product, we need to get the cateogry. Add Category to their table and 
+                                        // Insert products in their tables.
                                         products: for product in products {
                                             if let category = product.category {
                                                 if categories.filter({($0["id"] as? String) == category.id}).count == 0 {
@@ -72,9 +80,12 @@ class ViewController: UIViewController, ManageProductsDelegate {
                                                 }
                                             }
                                         }
+                                        // After save data, we need to retrieve data to show in the table
                                         let data = self.productsManager?.getProducts()
                                         self.tableViewManager.products = data
                                         self.tableViewManager.categories = categories
+                                        // Because we are managing data inside closure, we need to call UI modifications inside a 
+                                        // main thread.
                                         DispatchQueue.main.async {
                                             self.tableView.reloadData()
                                             self.loader(false)
