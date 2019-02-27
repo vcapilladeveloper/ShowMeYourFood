@@ -9,10 +9,12 @@
 import Foundation
 import UIKit
 
+// Protocol for implement the updatecart when select a button from a cell of the TableView
 protocol ManageProductsDelegate {
     func updateCart(_ count: Int, _ total: Double)
 }
 
+// Manage TableView data.
 final class TableViewManager: NSObject {
     var products: [[String: Any]]?
     var categories: [[String: Any]]?
@@ -45,6 +47,7 @@ extension TableViewManager: UITableViewDataSource, ProductCellDelegate {
         return categories?.count ?? 0
     }
     
+    // Return, for each section, the numbe of rows, in this case, the number of products for each category
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         var count = 0
         if let p = products, let c = categories {
@@ -54,6 +57,7 @@ extension TableViewManager: UITableViewDataSource, ProductCellDelegate {
         return count
     }
     
+    // Construct each cell for each product.
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: "productCell", for: indexPath) as? CellForFood else {
             return UITableViewCell()
@@ -72,6 +76,7 @@ extension TableViewManager: UITableViewDataSource, ProductCellDelegate {
         return cell
     }
     
+    // Set title for sections, in this case, for each category.
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         if let c = categories {
             return (c[section]["name"] as! String)
