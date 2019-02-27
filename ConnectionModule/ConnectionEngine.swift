@@ -14,13 +14,14 @@ open class ConnectionEngine: NSObject {
     static var dataGetTask: URLSessionDataTask?
     public typealias RequestResult = (_ data: Any?, _ error: Bool) -> Void
     
+    // Function for make the request, default with GET method. Return reuslt in completionHandler 
     open class func getResult(_ url: URL, _ method: String = "GET", completionHandler: @escaping RequestResult) {
-        
+        // For prevent more than one task at the same time, I cancel previous task if exist
         dataGetTask?.cancel()
+
         defaultSession = URLSession(configuration: .default)
         var urlRequest = URLRequest(url: url)
-        
-        //urlRequest.httpMethod = method
+       
         dataGetTask = defaultSession.dataTask(with: url) { data, response, error in
             if let response = response as? HTTPURLResponse { print(response.statusCode) }
             defer { self.dataGetTask = nil }
@@ -33,6 +34,7 @@ open class ConnectionEngine: NSObject {
                 completionHandler(nil, true)
             }
         }
+        // Execute the task
         defer {dataGetTask?.resume()}
     }
     
