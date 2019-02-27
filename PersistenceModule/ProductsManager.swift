@@ -9,37 +9,42 @@
 import Foundation
 import SQLite3
 
+// Class designed for manage the interactions with the Database for retrieve Products
 open class ProductsManager {
+    
     var selectStatement: String
     var persistenceModule: PersistenceModule?
     
+    // Init instance with a persisntence module instance injection. 
+    // We need the persistence module instance for not duplicate pointers to the database
     public init(_ persistenceModule: PersistenceModule) {
+        // Setup the selectStatement by default for get products
         selectStatement = """
         SELECT id, name, description, total, categoryId
         FROM Products WHERE name NOT NULL;
         """
         self.persistenceModule = persistenceModule
-        /* selectStatement = """
-         SELECT id, name, description, total
-         FROM Products p WHERE name NOT NULL;
-         """*/
     }
     
+    // Call this function to retrieve all products from database
     open func getProducts() -> [[String: Any]]? {
         var result: [[String: Any]]? = nil
         var queryStatement: OpaquePointer? = nil
-        // let persistenceModule: PersistenceModule?
-        // 1 Prepare the statement to be executed
+        // Prepare the statement to be executed
         do {
-            // persistenceModule = try PersistenceModule.open()
-            // 6 end the query
+            // end the query
             defer{ sqlite3_finalize(queryStatement) }
+            // If the selectStatement is executable, save inside queryStatement
             if sqlite3_prepare_v2(persistenceModule!.db, selectStatement, -1, &queryStatement, nil) == SQLITE_OK {
-                // 2 Execute the statement. It takes a ROW instead a OK because we tetrive a row
+                // Execute the statement. It takes a ROW instead a OK because we retrive a row
+                // Make a while bucle for get all objects from the select
                 while sqlite3_step(queryStatement) == SQLITE_ROW {
+                    // The first time we need to init result for insert values 
                     if result == nil {
                         result = [[String: Any]]()
                     }
+                    
+                    // Get ID in col0, name in col1, description in col2, total in col3 and categoryId in col4
                     var product = [String: Any]()
                     let queryResultCol0 = sqlite3_column_text(queryStatement, 0)
                     let id = String(cString: queryResultCol0!)
